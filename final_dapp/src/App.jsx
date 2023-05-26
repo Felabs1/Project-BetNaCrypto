@@ -1,5 +1,5 @@
 import DefaultPage from "./pages/DefaultPage";
-import "./app.css";
+import "./App.css";
 import ProfilePage from "./pages/ProfilePage";
 import BasketBall from "./pages/BasketBall";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
