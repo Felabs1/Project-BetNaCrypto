@@ -236,58 +236,57 @@ async function fetchSimulatedApiData() {
 }
 
 async function verifyBets() {
-  const noOfActivebets = await contract.methods.activeBetsCount().call();
-  // console.log(noOfActivebets);
+  const noOfActiveBets = await contract.methods.activeBetsCount().call();
   let activeBets = [];
-  for (let i = 1; i <= noOfActivebets; i++) {
+
+  for (let i = 1; i <= noOfActiveBets; i++) {
     await contract.methods
       .activeBets(i)
       .call()
       .then(({ accountId, betId }) => {
-        betId !== "0" ? activeBets.push({ accountId, betId }) : "";
+        if (betId !== "0") {
+          activeBets.push({ accountId, betId });
+        }
       });
   }
+
   console.log(activeBets);
-  activeBets.forEach(async ({ accountId, betId }) => {
-    //---------------------------------------
-    const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest");
+
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest");
+
+  for (let j = 0; j < activeBets.length; j++) {
+    const { accountId, betId } = activeBets[j];
     const gasEstimate = await contract.methods
       .verifyWon(accountId, betId)
       .estimateGas();
+    const gasPrice = await web3.eth.getGasPrice();
 
     const tx = {
       from: PUBLIC_KEY,
       to: CONTRACT_ADDRESS,
-      nonce: nonce,
-      gas: "10000000",
+      nonce: nonce + j, // Increment nonce for each transaction
+      gas: gasEstimate,
+      gasPrice: (Number(gasPrice) + j * 1000000000).toString(), // Increase gas price by 1 Gwei for each transaction
       data: contract.methods.verifyWon(accountId, betId).encodeABI(),
     };
 
-    const signPromise = web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
-    signPromise
-      .then((signedTx) => {
-        web3.eth.sendSignedTransaction(
-          signedTx.rawTransaction,
-          function (err, hash) {
-            if (!err) {
-              console.log(
-                "The hash of your transaction is: ",
-                hash,
-                "\n Check Alchemy's Mempool to view the status of your transaction!"
-              );
-            } else {
-              console.log(
-                "Something went wrong when submitting your transaction:",
-                err
-              );
-            }
-          }
-        );
-      })
-      .catch((err) => {
-        console.log("Promise failed:", err);
-      });
-  });
+    const signedTx = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+
+    try {
+      const { rawTransaction } = signedTx;
+      const receipt = await web3.eth.sendSignedTransaction(rawTransaction);
+      console.log(
+        "The hash of your transaction is:",
+        receipt.transactionHash,
+        "\nCheck Alchemy's Mempool to view the status of your transaction!"
+      );
+    } catch (err) {
+      console.log(
+        "Something went wrong when submitting your transaction:",
+        err
+      );
+    }
+  }
 }
 
 let teamNames = [];
