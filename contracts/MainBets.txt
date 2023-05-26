@@ -33,8 +33,7 @@ contract Operations {
         uint deposit;
         string totalOdds;
         uint possiblePayout;
-        uint timestamp; 
-        bool withdrawn;       
+        uint timestamp;        
     }
 
     struct SpinAndWin{
@@ -58,11 +57,8 @@ contract Operations {
         uint betId;
     }
 
-    address contractOwner;
-
-
      constructor() public payable{
-        contractOwner = msg.sender;
+        
     }
 
     uint public spinAndWinCount;
@@ -77,8 +73,7 @@ contract Operations {
     mapping(uint => EventGame[]) public nextVirtualGame;
     mapping(uint => ActiveBets) public activeBets;
 
-    event PlaceBet(uint betId, uint deposit, uint timestamp, address customer);
-    event wonSpin(uint betId, uint deposit, uint timestamp, address customer);
+    // event betPlaced()
 
     
 
@@ -116,10 +111,9 @@ string memory outcome = "pending";
         for(uint i = 0; i < minibet.length; i++){
             normalbets[accountId][betCount].push(miniBets(minibet[i].matchId,minibet[i].teamNames,minibet[i].category, minibet[i].pick, outcome , false));     
         }     
-        justTrackBets[accountId].push(NormalBet(betCount, false, false, _deposit, _totalOdds, _possiblePayout, block.timestamp, false));
+        justTrackBets[accountId].push(NormalBet(betCount, false, false, _deposit, _totalOdds, _possiblePayout, block.timestamp));
         activeBetsCount++;
         activeBets[activeBetsCount] = ActiveBets(msg.sender, betCount);
-        emit PlaceBet(betCount, _deposit, block.timestamp, msg.sender);
         return "bet successfully";
     }
 
@@ -175,7 +169,91 @@ string memory outcome = "pending";
                 }
             }
             
-            
+            else if(compareBets(category, "Double Chance") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                if(homeGoals > awayGoals || homeGoals == awayGoals){
+                    FTresult = "1/X";
+                }else if(awayGoals > homeGoals || homeGoals == awayGoals){
+                    FTresult = "X/2";
+                }else if(awayGoals > homeGoals || homeGoals > awayGoals){
+                    FTresult = "1/2";
+                }
+            }else if(compareBets(category, "Total") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                uint totalGoals = homeGoals + awayGoals;
+                if(totalGoals > 0 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 0.5")){
+                    FTresult = "Over 0.5";
+                }else{
+                    FTresult = "Under 0.5";
+                }
+
+                if(totalGoals > 1 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 1.5")){
+                    FTresult = "Over 1.5";
+                }else{
+                    FTresult = "Under 1.5";
+                }
+
+                if(totalGoals > 2 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 2.5")){
+                    FTresult = "Over 2.5";
+                }else{
+                    FTresult = "Under 2.5";
+                }
+
+                if(totalGoals > 3 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 3.5")){
+                    FTresult = "Over 3.5";
+                }else{
+                    FTresult = "Under 3.5";
+                }
+
+                if(totalGoals > 4 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 4.5")){
+                    FTresult = "Over 4.5";
+                }else{
+                    FTresult = "Under 4.5";
+                }
+
+
+                if(totalGoals > 5 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 5.5")){
+                    FTresult = "Over 5.5";
+                }else{
+                    FTresult = "Under 5.5";                
+                }
+
+                if(totalGoals < 6 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 5.5")){
+                    FTresult = "Under 5.5";
+                }else{
+                    FTresult = "Over 5.5";                
+                }
+
+                if(totalGoals < 5 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 4.5")){
+                    FTresult = "Under 4.5";
+                }else{
+                    FTresult = "Over 4.5";                
+                }
+
+                if(totalGoals < 4 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 3.5")){
+                    FTresult = "Under 3.5";
+                }else{
+                    FTresult = "Over 3.5";                
+                }
+
+                if(totalGoals < 3 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 2.5")){
+                    FTresult = "Under 2.5";
+                }else{
+                    FTresult = "Over 2.5";                
+                }
+
+                if(totalGoals < 2 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 1.5")){
+                    FTresult = "Under 1.5";
+                }else{
+                    FTresult = "Over 1.5";                
+                }
+
+                if(totalGoals < 1 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 0.5")){
+                    FTresult = "Under 0.5";
+                }else{
+                    FTresult = "Over 0.5";                
+                }
+
+            }
+
             normalbets[_accountId][_betId][i].outcome = FTresult;
             
             if(compareBets(normalbets[_accountId][_betId][i].outcome, normalbets[_accountId][_betId][i].pick) == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
@@ -212,6 +290,11 @@ string memory outcome = "pending";
         }
     }
 
+    // function claimWinnings(uint _betId){
+    //     address payable accountId = payable(msg.sender);
+    // }
+    
+
     // this function allows you to stake and stores your stake data regardless of a win or a lose
     function stakeSpinAndWin(string memory _betResult, string memory _gamingOdds, uint256 _deposit, uint _winnings) public payable returns(string memory){
          spinAndWinCount++;
@@ -226,7 +309,7 @@ string memory outcome = "pending";
             return "bet lost";
         }
 
-        emit wonSpin(spinAndWinCount, msg.value, block.timestamp, msg.sender);
+        // emit NewSpin(msg.sender, _betResult, _gamingOdds, _deposit, _winnings);
     }
 
     // this function allows you to get your array spins according your account
@@ -248,21 +331,10 @@ string memory outcome = "pending";
          
     }
 
-    function withdrawWinnings(uint _betId) external {
-        address payable accountId = payable(msg.sender);
-        uint length = justTrackBets[msg.sender].length;
-        for(uint i = 0; i < length; i++){
-            if(justTrackBets[msg.sender][i].betId == _betId){
-            require(justTrackBets[msg.sender][i].withdrawn == false, "allready withdrew funds");
-            accountId.transfer(justTrackBets[msg.sender][i].possiblePayout);
-            justTrackBets[msg.sender][i].withdrawn = true;
-            }
-         }
-    } 
+
    
 
     function sendEther(address payable _recipient) external {
-        require(msg.sender == contractOwner, "only the contract owner");
         _recipient.transfer(1 ether);
     }
 

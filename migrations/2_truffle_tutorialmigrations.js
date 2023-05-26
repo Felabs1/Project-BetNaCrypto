@@ -1,9 +1,6 @@
 const Hello = artifacts.require("Operations");
-const sendingEther = artifacts.require("sendingEther");
+// const MainBets = artifacts.require("MainBets");
 
 module.exports = function (deployer) {
   deployer.deploy(Hello);
-
-  // deployer.deploy(sendingEther);
-  // const a = await Operations.deployed()
 };

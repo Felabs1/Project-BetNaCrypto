@@ -1,0 +1,24 @@
+pragma solidity >=0.4.1;
+
+contract HelloWorld {
+    
+    uint initialNumber;
+    uint trans;
+
+    
+
+    function createRandomNumber()public returns(uint){
+
+        initialNumber = uint(blockhash(block.number - 1)) % 3600;
+    }
+
+   function getRandomNumber()public view returns(address){
+    return address(this);
+   }
+
+    function random(uint number) public view returns(uint){
+        return uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender))) % number;
+    }
+
+     
+}

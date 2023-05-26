@@ -3,7 +3,7 @@
 
 const Operations = artifacts.require("Operations");
 console.clear();
-contract("Operations", (accounts) => {
+contract("Operation", (accounts) => {
   let a;
 
   beforeEach(async () => {
@@ -144,8 +144,8 @@ contract("Operations", (accounts) => {
       },
       {
         eventId: "2",
-        homeTeam: "Man U",
-        awayTeam: "Chelsea",
+        homeTeam: "Brentford",
+        awayTeam: "Brightone",
         homeGoals: 1,
         awayGoals: 1,
         dateTime: 123456,
@@ -153,8 +153,8 @@ contract("Operations", (accounts) => {
       },
       {
         eventId: "3",
-        homeTeam: "Man U",
-        awayTeam: "Chelsea",
+        homeTeam: "Anderletch",
+        awayTeam: "Fenebahrce",
         homeGoals: 1,
         awayGoals: 1,
         dateTime: 123456,
@@ -162,8 +162,8 @@ contract("Operations", (accounts) => {
       },
       {
         eventId: "4",
-        homeTeam: "Man U",
-        awayTeam: "Chelsea",
+        homeTeam: "Real Madrid",
+        awayTeam: "Barcelone",
         homeGoals: 1,
         awayGoals: 1,
         dateTime: 123456,
@@ -215,10 +215,106 @@ contract("Operations", (accounts) => {
       200000,
       { from: accounts[0] }
     );
+    let activeBets = await a.activeBets(1);
     let view = await a.viewNormalBets(accounts[0], 1);
+    console.log(activeBets);
     const verify = await a.verifyWon(accounts[0], 1);
     // view = await a.viewNormalBets(accounts[0], 1);
     view = await a.viewTrackedBets(accounts[0]);
+    // activeBets = await a.activeBets(1);
+    // console.log(view);
     assert.equal(view[0].betWon, false);
+  });
+  it("should track activebets well", async () => {
+    const eventGames = [
+      {
+        eventId: "1",
+        homeTeam: "Man U",
+        awayTeam: "Chelsea",
+        homeGoals: 0,
+        awayGoals: 0,
+        dateTime: 123456,
+        matchFinished: 1,
+      },
+      {
+        eventId: "2",
+        homeTeam: "Brentford",
+        awayTeam: "Brightone",
+        homeGoals: 1,
+        awayGoals: 1,
+        dateTime: 123456,
+        matchFinished: 1,
+      },
+      {
+        eventId: "3",
+        homeTeam: "Anderletch",
+        awayTeam: "Fenebahrce",
+        homeGoals: 1,
+        awayGoals: 1,
+        dateTime: 123456,
+        matchFinished: 0,
+      },
+      {
+        eventId: "4",
+        homeTeam: "Real Madrid",
+        awayTeam: "Barcelone",
+        homeGoals: 1,
+        awayGoals: 1,
+        dateTime: 123456,
+        matchFinished: 0,
+      },
+    ];
+
+    for ({
+      eventId,
+      homeTeam,
+      awayTeam,
+      homeGoals,
+      awayGoals,
+      dateTime,
+      matchFinished,
+    } of eventGames) {
+      await a.registerEventGame(
+        eventId,
+        homeTeam,
+        awayTeam,
+        homeGoals,
+        awayGoals,
+        dateTime,
+        matchFinished
+      );
+    }
+
+    await a.placeNormalBet(
+      [
+        {
+          matchId: 1,
+          teamNames: "Man U - Ars",
+          category: "1X2",
+          pick: "X",
+          outcome: "",
+          won: false,
+        },
+        {
+          matchId: 2,
+          teamNames: "Che - Liv",
+          category: "Total",
+          pick: "Under 2.5",
+          outcome: "",
+          won: false,
+        },
+      ],
+      100000,
+      "2.0",
+      200000,
+      { from: accounts[0] }
+    );
+    let activeBets = await a.activeBets(1);
+    const verify = await a.verifyWon(accounts[0], 1);
+    view = await a.viewNormalBets(accounts[0], 1);
+    console.log(view);
+
+    activeBets = await a.activeBets(1);
+    console.log(activeBets);
   });
 });

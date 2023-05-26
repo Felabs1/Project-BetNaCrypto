@@ -1,0 +1,104 @@
+library BetLibrary {
+    function compareBets(string memory a, string memory b) public pure returns (bool) {
+            return keccak256(bytes(a)) == keccak256(bytes(b));
+    }
+    function verifyWon(address _accountId, uint _betId) public {
+        uint l = normalbets[_accountId][_betId].length;
+        uint trackedBetsLengthForActiveBets = normalbets[_accountId][_betId].length;
+        uint counterLosses;
+    // mapping(uint => EventGame) => public eventGames;
+
+        for(uint i = 0; i < l && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1; i++){
+            uint gameId = eventGames[normalbets[_accountId][_betId][i].matchId].eventId;
+            uint homeGoals = eventGames[normalbets[_accountId][_betId][i].matchId].homeGoals;
+            uint awayGoals = eventGames[normalbets[_accountId][_betId][i].matchId].awayGoals;
+            string memory FTresult;
+            string memory category = normalbets[_accountId][_betId][i].category;
+
+            if(compareBets(category, "1X2") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                if(homeGoals > awayGoals){
+                FTresult = "1";
+                }else if(awayGoals > homeGoals){
+                    FTresult = "2";
+                }else{
+                    FTresult = "X";
+                }
+            }else if(compareBets(category, "GG/NG") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                if(homeGoals > 0 && awayGoals > 0){
+                    FTresult = "GG";
+                }else if(homeGoals > 0 && awayGoals == 0){
+                    FTresult = "NG";
+                }else if(homeGoals == 0 && awayGoals > 0){
+                    FTresult = "NG";
+                }else if(homeGoals == 0 && awayGoals == 0){
+                    FTresult = "NG";
+                }
+            }else if(compareBets(category, "OV/UN") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                uint totalGoals = homeGoals + awayGoals;
+                if(totalGoals >= 3 ){
+                    FTresult = "OV25";
+                }else{
+                    FTresult = "UN25";
+                }
+            }else if(compareBets(category, "Double Chance") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                if(homeGoals > awayGoals || homeGoals == awayGoals){
+                    FTresult = "1/X";
+                }else if(awayGoals > homeGoals || homeGoals == awayGoals){
+                    FTresult = "X/2";
+                }else if(awayGoals > homeGoals || homeGoals > awayGoals){
+                    FTresult = "1/2";
+                }
+            }else if(compareBets(category, "Total") == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                uint totalGoals = homeGoals + awayGoals;
+                totalGoals > 0 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 0.5") == true ? FTresult = "Over 0.5" : FTresult = "Under 0.5";
+                totalGoals > 1 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 1.5") == true ? FTresult = "Over 1.5" : FTresult = "Under 1.5";
+                totalGoals > 2 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 2.5") == true ? FTresult = "Over 2.5" : FTresult = "Under 2.5";
+                totalGoals > 3 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 3.5") == true ? FTresult = "Over 3.5" : FTresult = "Under 3.5";
+                totalGoals > 4 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 4.5") == true ? FTresult = "Over 4.5" : FTresult = "Under 4.5";
+                totalGoals > 5 && compareBets(normalbets[_accountId][_betId][i].pick,"Over 5.5") == true ? FTresult = "Over 5.5" : FTresult = "Under 5.5";
+                totalGoals < 6 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 5.5") == true ? FTresult = "Under 5.5" : FTresult = "Over 5.5";
+                totalGoals < 5 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 4.5") == true ? FTresult = "Under 4.5" : FTresult = "Over 4.5";
+                totalGoals < 4 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 3.5") == true ?  FTresult = "Under 3.5" : FTresult = "Over 3.5";
+                totalGoals < 3 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 2.5") == true ? FTresult = "Under 2.5" : FTresult = "Over 2.5";
+                totalGoals < 2 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 1.5") == true ? FTresult = "Under 1.5" : FTresult = "Over 1.5"; 
+                totalGoals < 1 && compareBets(normalbets[_accountId][_betId][i].pick,"Under 0.5") == true ?FTresult = "Under 0.5" : FTresult = "Over 0.5";
+
+            }
+
+            normalbets[_accountId][_betId][i].outcome = FTresult;
+            
+            if(compareBets(normalbets[_accountId][_betId][i].outcome, normalbets[_accountId][_betId][i].pick) == true && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+            normalbets[_accountId][_betId][i].won = true;
+            }else if(compareBets(normalbets[_accountId][_betId][i].outcome, normalbets[_accountId][_betId][i].pick) == false && eventGames[normalbets[_accountId][_betId][i].matchId].matchFinished == 1){
+                normalbets[_accountId][_betId][i].won = false;
+                counterLosses++;
+            }
+            trackedBetsLengthForActiveBets--;
+        }
+            
+        uint trackedBetsLength = viewTrackedBets(_accountId).length;
+        for(uint i = 0; i < trackedBetsLength && trackedBetsLengthForActiveBets == 0; i++){
+            if(justTrackBets[_accountId][i].betId == _betId){
+                if(counterLosses  < 1){
+        
+                    justTrackBets[_accountId][i].betFinished = true;
+                    justTrackBets[_accountId][i].betWon = true;
+                    delete activeBets[_betId];
+                    activeBetsCount--;
+                }
+            }
+        }
+
+        for(uint i = 0; i < trackedBetsLength; i++){
+            if(justTrackBets[_accountId][i].betId == _betId){
+                if(counterLosses > 0){
+                    justTrackBets[_accountId][i].betFinished = true;
+                    justTrackBets[_accountId][i].betWon = false;
+                    delete activeBets[_betId];
+                    activeBetsCount--;
+                }     
+            }     
+        }
+    }
+
+}

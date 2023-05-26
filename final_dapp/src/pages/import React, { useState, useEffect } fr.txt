@@ -1,0 +1,27 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+function RealTimeData() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios.get("https://api.example.com/data");
+      setData(result.data);
+    };
+
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 5000); // Request new data every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div>
+      {data.map((item) => (
+        <div key={item.id}>{item.name}</div>
+      ))}
+    </div>
+  );
+}
