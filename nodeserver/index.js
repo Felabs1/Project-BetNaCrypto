@@ -9,6 +9,7 @@ const web3 = createAlchemyWeb3(API_URL);
 const { abi } = require("./abi.js");
 const { PUBLIC_KEY, PRIVATE_KEY, CONTRACT_ADDRESS } = process.env;
 const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
