@@ -11,6 +11,7 @@ const { PUBLIC_KEY, PRIVATE_KEY, CONTRACT_ADDRESS } = process.env;
 const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
 const app = express();
+app.use(cors());
 
 function generateUniqueRandomNumber(min, max) {
   const usedNumbers = new Set();
