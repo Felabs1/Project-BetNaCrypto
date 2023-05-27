@@ -1,8 +1,9 @@
-import DefaultPage from "./pages/DefaultPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import "./App.css";
+import DefaultPage from "./pages/DefaultPage";
 import ProfilePage from "./pages/ProfilePage";
 import BasketBall from "./pages/BasketBall";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Casino from "./pages/Casino";
 import VerifyAccount from "./pages/VerifyAccount";
 import MyAccount from "./pages/MyAccount";

@@ -24,13 +24,7 @@ const AccountCard = () => {
   console.log(accountsDetails);
   return (
     <>
-      <div
-        className="w3-container"
-        style={{
-          backgroundImage:
-            "linear-gradient(116deg, #020202, #060702, #2d2d10 )",
-        }}
-      >
+      <div className="w3-container account-card-div">
         <div className="w3-text-white w3-padding">
           <span className="w3-left">
             {Object.entries(accountsDetails).length > 0
@@ -63,8 +57,7 @@ const AccountCard = () => {
           <br />
           <Link
             to="/profile/my-transactions"
-            className="w3-btn w3-hover-text-yellow"
-            style={{ backgroundColor: "#3f410c", color: "#8d920d" }}
+            className="w3-btn view-transaction-button w3-hover-text-yellow"
           >
             View Transactions
           </Link>
@@ -73,7 +66,7 @@ const AccountCard = () => {
         </div>
       </div>
       <div
-        className="w3-container w3-text-white"
+        className="w3-container sign-out-button w3-text-white"
         style={{ backgroundColor: "#1b1b1b" }}
       >
         <button

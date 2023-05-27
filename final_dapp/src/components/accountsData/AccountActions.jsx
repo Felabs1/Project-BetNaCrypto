@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import UserAccountsAccountsData from "./UserAccountsAccountsData";
 import UserFunctionAccordionHeading from "./UserFunctionAccordionHeading";
+import styles from "./AccountAction.module.css";
 
 const AccountActions = () => {
   const [personalDataOpen, setPersonalDataOpen] = useState(false);
@@ -28,10 +29,8 @@ const AccountActions = () => {
   return (
     <div className="w3-container w3-text-white">
       <div>
-        <span className="w3-large" style={{ fontWeight: "bold" }}>
-          My Profile
-        </span>
-        <div className="w3-container" style={{ backgroundColor: "#101010" }}>
+        <span className={styles.myProfile + " w3-large"}>My Profile</span>
+        <div className="w3-container user-accordion-heading">
           <UserFunctionAccordionHeading
             onClick={openUserAccountsData}
             heading="PersonalData"

@@ -30,7 +30,7 @@ function VirtualSports() {
   );
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:3000/");
+    const eventSource = new EventSource("https://bnk-vmu2.onrender.com/");
     eventSource.addEventListener("message", (event) => {
       const newData = JSON.parse(event.data);
       setDataFromApi(newData);

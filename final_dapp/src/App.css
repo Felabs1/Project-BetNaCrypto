@@ -54,3 +54,20 @@
     margin-left: 0px;
   }
 }
+
+.user-accordion-heading {
+  background-color: #101010;
+}
+
+.account-card-div {
+  background-image: linear-gradient(116deg, #020202, #060702, #2d2d10);
+}
+
+.view-transaction-button {
+  background-color: #3f410c;
+  color: #8d920d;
+}
+
+.sign-out-button {
+  background-color: #1b1b1b;
+}
