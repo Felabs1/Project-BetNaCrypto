@@ -14,26 +14,47 @@ const MyBets = ({ transactions, history }) => {
   const openBetDetails = (userid) => {
     history.push(`/transaction/${userid}`);
   };
-  useEffect(() => {
-    async function showMyBets() {
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      const account = accounts[0];
-      const data = await contract.methods.viewTrackedBets(account).call();
-      // console.log(data);
-      const formattedData = [];
-      for (let i = 0; i < data.length; i++) {
-        formattedData.push({
-          betId: data[i]["betId"],
-          betFinished: data[i]["betFinished"],
-          possiblePayout: data[i]["possiblePayout"],
-          betWon: data[i]["betWon"],
-          deposit: data[i]["deposit"],
+
+  const handleVerify = async (e) => {
+    const value = e.target.value;
+    const accounts = await ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const account = accounts[0];
+    try {
+      const verify = await contract.methods
+        .verifyWon(account, value)
+        .send({ from: account, gasLimit: "1000000" })
+        .then((data) => {
+          alert("claim successful check wallet");
+          showMyBets();
         });
-      }
-      setContractData(formattedData);
+    } catch (e) {
+      alert("some error occured");
+      console.log(e);
     }
+  };
+
+  async function showMyBets() {
+    const accounts = await ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const account = accounts[0];
+    const data = await contract.methods.viewTrackedBets(account).call();
+    // console.log(data);
+    const formattedData = [];
+    for (let i = 0; i < data.length; i++) {
+      formattedData.push({
+        betId: data[i]["betId"],
+        betFinished: data[i]["betFinished"],
+        possiblePayout: data[i]["possiblePayout"],
+        betWon: data[i]["betWon"],
+        deposit: data[i]["deposit"],
+      });
+    }
+    setContractData(formattedData);
+  }
+  useEffect(() => {
     showMyBets();
   }, []);
 
@@ -143,6 +164,28 @@ const MyBets = ({ transactions, history }) => {
                                     >
                                       View <FaEye />
                                     </Link>
+                                  </span>
+                                ) : betFinished == false ? (
+                                  <span>
+                                    <Link
+                                      className="w3-btn w3-padding-small w3-small"
+                                      style={{
+                                        border: "1px solid #3f410c",
+                                        color: "#8d920d",
+                                      }}
+                                      to={`/profile/Normal%20Bets/${betId}`}
+                                    >
+                                      View <FaEye />
+                                    </Link>
+                                    &nbsp;
+                                    <button
+                                      className="w3-btn w3-padding-small w3-small"
+                                      style={{ backgroundColor: "#3f410c" }}
+                                      value={betId}
+                                      onClick={handleVerify}
+                                    >
+                                      verify
+                                    </button>
                                   </span>
                                 ) : (
                                   <Link

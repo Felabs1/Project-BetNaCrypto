@@ -203,7 +203,7 @@ const TopNav = () => {
           <FaBars />
         </div>
         <div className="user w3-hide-small">
-          {accounts ? (
+          {accounts == true ? (
             <button
               className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
               style={{
@@ -217,7 +217,7 @@ const TopNav = () => {
                 My Profile
               </Link>
             </button>
-          ) : (
+          ) : accounts == false ? (
             <button
               className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
               style={{
@@ -232,6 +232,22 @@ const TopNav = () => {
               {/* <Link to="/profile" style={{ textDecoration: "none" }}>
               Connect Wallet
             </Link> */}
+            </button>
+          ) : (
+            <button
+              className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
+              style={{
+                backgroundColor: "#3f410c",
+                margin: "4px 4px",
+                padding: "4px",
+                color: "#8d920d",
+              }}
+              onClick={connectMetamask}
+            >
+              Connect Wallet
+              {/* <Link to="/profile" style={{ textDecoration: "none" }}>
+          Connect Wallet
+        </Link> */}
             </button>
           )}
         </div>
@@ -254,7 +270,7 @@ const TopNav = () => {
           );
         })}
         <div className="w3-small">
-          {accounts ? (
+          {accounts == true ? (
             <button
               className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
               style={{
@@ -268,7 +284,7 @@ const TopNav = () => {
                 My Profile
               </Link>
             </button>
-          ) : (
+          ) : accounts == false ? (
             <button
               className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
               style={{
@@ -283,6 +299,22 @@ const TopNav = () => {
               {/* <Link to="/profile" style={{ textDecoration: "none" }}>
               Connect Wallet
             </Link> */}
+            </button>
+          ) : (
+            <button
+              className="w3-btn w3-hover-text-yellow w3-round-large w3-bar-item"
+              style={{
+                backgroundColor: "#3f410c",
+                margin: "4px 4px",
+                padding: "4px",
+                color: "#8d920d",
+              }}
+              onClick={connectMetamask}
+            >
+              Login
+              {/* <Link to="/profile" style={{ textDecoration: "none" }}>
+          Connect Wallet
+        </Link> */}
             </button>
           )}
         </div>

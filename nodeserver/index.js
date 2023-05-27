@@ -11,6 +11,19 @@ const { PUBLIC_KEY, PRIVATE_KEY, CONTRACT_ADDRESS } = process.env;
 const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 
 const app = express();
+
+function generateUniqueRandomNumber(min, max) {
+  const usedNumbers = new Set();
+
+  while (true) {
+    const randomNumber = Math.floor(Math.random() * (max - min + 1) + min);
+
+    if (!usedNumbers.has(randomNumber)) {
+      usedNumbers.add(randomNumber);
+      return randomNumber;
+    }
+  }
+}
 let teams = [
   "Manchester United",
   "New Castle",
@@ -31,6 +44,7 @@ let teams = [
 ];
 
 let serveTeams = [];
+let finishedMatches = [];
 
 const contractOwner = "0xB384a0f96D14C293974a9818f45936A0b0dcEB14";
 async function createDraw() {
@@ -49,8 +63,9 @@ async function createDraw() {
   const time = hours + ":" + minutes;
 
   for (let i = 0; i < teams.length; i += 2) {
+    const randomNumber = generateUniqueRandomNumber(1, 999999999);
     obj.push({
-      eventId: i + 1,
+      eventId: randomNumber,
       homeTeam: teams[i],
       awayTeam: teams[i + 1],
       homeGoals: 0,
@@ -59,7 +74,7 @@ async function createDraw() {
       matchFinished: 0,
     });
     serveTeams.push({
-      eventId: i + 1,
+      eventId: randomNumber,
       homeTeam: teams[i],
       awayTeam: teams[i + 1],
       homeGoals: 0,
@@ -106,81 +121,84 @@ async function createDraw() {
           console.log(simulatedDuration);
           if (simulatedDuration >= 120) {
             array[index].matchFinished = 1;
-            homeGoals > awayGoals
-              ? `${homeTeam} won`
-              : awayGoals > homeGoals
-              ? `${awayTeam} won`
-              : "draw";
+            finishedMatches.push(array[index]);
+            // homeGoals > awayGoals
+            //   ? `${homeTeam} won`
+            //   : awayGoals > homeGoals
+            //   ? `${awayTeam} won`
+            //   : "draw";
 
-            //-------------------\
-            const nonce = await web3.eth.getTransactionCount(
-              PUBLIC_KEY,
-              "latest"
-            );
-            const gasEstimate = await contract.methods
-              .registerEventGame(
-                eventId,
-                homeTeam,
-                awayTeam,
-                homeGoals,
-                awayGoals,
-                dateTime,
-                "1"
-              )
-              .estimateGas();
+            // //-------------------\
+            // const nonce = await web3.eth.getTransactionCount(
+            //   PUBLIC_KEY,
+            //   "latest"
+            // );
+            // const gasEstimate = await contract.methods
+            //   .registerEventGame(
+            //     eventId,
+            //     homeTeam,
+            //     awayTeam,
+            //     homeGoals,
+            //     awayGoals,
+            //     dateTime,
+            //     "1"
+            //   )
+            //   .estimateGas();
+            // const gasPrice = await web3.eth.getGasPrice();
 
-            const tx = {
-              from: PUBLIC_KEY,
-              to: CONTRACT_ADDRESS,
-              nonce: nonce,
-              gas: "10000000",
-              data: contract.methods
-                .registerEventGame(
-                  eventId,
-                  homeTeam,
-                  awayTeam,
-                  homeGoals,
-                  awayGoals,
-                  dateTime,
-                  "1"
-                )
-                .encodeABI(),
-            };
+            // const tx = {
+            //   from: PUBLIC_KEY,
+            //   to: CONTRACT_ADDRESS,
+            //   nonce: nonce,
+            //   gas: "20000000",
+            //   gasPrice: gasPrice,
+            //   data: contract.methods
+            //     .registerEventGame(
+            //       eventId,
+            //       homeTeam,
+            //       awayTeam,
+            //       homeGoals,
+            //       awayGoals,
+            //       dateTime,
+            //       "1"
+            //     )
+            //     .encodeABI(),
+            // };
 
-            const signPromise = web3.eth.accounts.signTransaction(
-              tx,
-              PRIVATE_KEY
-            );
-            signPromise
-              .then((signedTx) => {
-                web3.eth.sendSignedTransaction(
-                  signedTx.rawTransaction,
-                  function (err, hash) {
-                    if (!err) {
-                      console.log(
-                        "The hash of your transaction is: ",
-                        hash,
-                        "\n Check Alchemy's Mempool to view the status of your transaction!"
-                      );
-                      verifyBets();
-                    } else {
-                      console.log(
-                        "Something went wrong when submitting your transaction:",
-                        err
-                      );
-                    }
-                  }
-                );
-              })
-              .catch((err) => {
-                console.log("Promise failed:", err);
-              });
+            // const signPromise = web3.eth.accounts.signTransaction(
+            //   tx,
+            //   PRIVATE_KEY
+            // );
+            // signPromise
+            //   .then((signedTx) => {
+            //     web3.eth.sendSignedTransaction(
+            //       signedTx.rawTransaction,
+            //       function (err, hash) {
+            //         if (!err) {
+            //           console.log(
+            //             "The hash of your transaction is: ",
+            //             hash,
+            //             "\n Check Alchemy's Mempool to view the status of your transaction!"
+            //           );
+            //           verifyBets();
+            //         } else {
+            //           console.log("Final Update Error", err);
+            //           signPromise;
+            //         }
+            //       }
+            //     );
+            //   })
+            //   .catch((err) => {
+            //     console.log("Promise failed:", err);
+            //   });
             clearInterval(intervalId);
           }
         }, Math.floor(Math.random() * 60000) + 10000);
       }
     }
   );
+
+  dealWithFinishedMatches();
 
   const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest");
   const gasEstimate = await contract.methods
@@ -221,6 +239,53 @@ async function createDraw() {
     });
 }
 
+async function dealWithFinishedMatches() {
+  console.log(finishedMatches);
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest");
+  const gasEstimate = await contract.methods
+    .registerMultipleEventGames(finishedMatches)
+    .estimateGas();
+
+  const tx = {
+    from: PUBLIC_KEY,
+    to: CONTRACT_ADDRESS,
+    nonce: nonce,
+    gas: "10000000",
+    data: contract.methods
+      .registerMultipleEventGames(finishedMatches)
+      .encodeABI(),
+  };
+
+  const signPromise = web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+  signPromise
+    .then((signedTx) => {
+      web3.eth.sendSignedTransaction(
+        signedTx.rawTransaction,
+        function (err, hash) {
+          if (!err) {
+            console.log(
+              "The hash of your transaction is: ",
+              hash,
+              "\n Check Alchemy's Mempool to view the status of your transaction!"
+            );
+            finishedMatches = [];
+            verifyBets();
+          } else {
+            console.log(
+              "Something went wrong when submitting your transaction:",
+              err
+            );
+          }
+        }
+      );
+    })
+    .catch((err) => {
+      console.log("Promise failed:", err);
+    });
+  finishedMatches = [];
+  console.log(finishedMatches);
+}
+
 // setInterval(createDraw, 130000);
 setTimeout(() => {
   createDraw();
@@ -252,7 +317,7 @@ async function verifyBets() {
 
   console.log(activeBets);
 
-  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest");
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "pending");
 
   for (let j = 0; j < activeBets.length; j++) {
     const { accountId, betId } = activeBets[j];
@@ -275,16 +340,14 @@ async function verifyBets() {
     try {
       const { rawTransaction } = signedTx;
       const receipt = await web3.eth.sendSignedTransaction(rawTransaction);
+      console.log("this was successful");
       console.log(
         "The hash of your transaction is:",
         receipt.transactionHash,
         "\nCheck Alchemy's Mempool to view the status of your transaction!"
       );
     } catch (err) {
-      console.log(
-        "Something went wrong when submitting your transaction:",
-        err
-      );
+      console.log("verification error", err);
     }
   }
 }
