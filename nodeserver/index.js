@@ -12,7 +12,11 @@ const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS);
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 function generateUniqueRandomNumber(min, max) {
   const usedNumbers = new Set();
