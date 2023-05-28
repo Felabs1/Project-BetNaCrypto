@@ -13,6 +13,11 @@ const cors = require("cors");
 
 const app = express();
 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://bnk-nu.vercel.app");
+  next();
+});
+
 app.use(
   cors({
     origin: [
@@ -558,19 +563,6 @@ async function dealWithWon() {
           .catch((err) => {
             console.log("Promise failed:", err);
           });
-
-        // const verify = contract.methods
-        //   .registerEventGame(
-        //     eventId,
-        //     homeTeam,
-        //     awayTeam,
-        //     homeGoals,
-        //     awayGoals,
-        //     dateTime,
-        //     "1"
-        //   )
-        //   .send({ from: contractOwner, gasLimit: "10000000" })
-        //   .then(verifyBets());
       } else {
         console.log("match started");
         console.log(timestampInSeconds, dateTimeString);
@@ -615,7 +607,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("Server started on port 3000");
   console.log("http://localhost:3000");
 });
