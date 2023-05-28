@@ -26,7 +26,7 @@ const MyBets = ({ transactions, history }) => {
         .verifyWon(account, value)
         .send({ from: account, gasLimit: "1000000" })
         .then((data) => {
-          alert("claim successful check wallet");
+          alert("verification Successful");
           showMyBets();
         });
     } catch (e) {
