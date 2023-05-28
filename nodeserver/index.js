@@ -1,7 +1,6 @@
 const express = require("express");
 
 require("dotenv").config();
-require("dotenv").config();
 const API_URL =
   "https://eth-sepolia.g.alchemy.com/v2/jV8fi5SzfPTd82x7yYcq4T3TIH04Y_pv";
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
@@ -606,12 +605,4 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(3000, "0.0.0.0", () => {
-  console.log("Server started on port 3000");
-  console.log("http://localhost:3000");
-});
-// fetchSimulatedApiData();
-// verifyBets();
-
-// setInterval(fetchSimulatedApiData, 3000);
-// setInterval(verifyBets, 3000);
+module.exports = app;
