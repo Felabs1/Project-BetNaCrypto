@@ -13,10 +13,16 @@ const cors = require("cors");
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  next();
-});
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://bnk-nu.vercel.app",
+      "https://betnakrypto.onrender.com",
+    ],
+    credentials: true,
+  })
+);
 
 function generateUniqueRandomNumber(min, max) {
   const usedNumbers = new Set();
@@ -577,7 +583,7 @@ async function dealWithWon() {
 updateData();
 const interval1 = setInterval(() => {
   updateData();
-}, 12 * 60 * 60 * 1000); // Run every 12 hours (twice a day)
+}, (12 * 60 * 60 * 1000) / 48); // Run every 12 hours (twice a day)
 
 // Interval 2: Run 96 times per day
 const interval2 = setInterval(() => {
@@ -592,8 +598,8 @@ setTimeout(() => {
 }, 24 * 60 * 60 * 1000);
 
 app.get("/", (req, res) => {
-  // res.header("Access-Control-Allow-Origin", "*");
-  // res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");

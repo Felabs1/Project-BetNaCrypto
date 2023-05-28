@@ -1,6 +1,9 @@
 // import "truffle/Assert.sol";
-// import "../contracts/Opeations.sol";
 
+const { default: Web3 } = require("web3");
+
+// import "../contracts/Opeations.sol";
+const web3 = new Web3("HTTP://127.0.0.1:7545");
 const Operations = artifacts.require("Operations");
 console.clear();
 contract("Operation", (accounts) => {
