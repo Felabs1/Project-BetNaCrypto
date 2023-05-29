@@ -111,6 +111,15 @@ function DefaultPage() {
     });
   };
 
+  function isTimeEarlier(time) {
+    const currentTime = new Date();
+    const today = new Date();
+    const fromDate = today.toISOString().split("T")[0];
+    const providedTime = new Date(`${fromDate} ${time}`);
+
+    return providedTime < currentTime;
+  }
+
   const handleRemoveBet = (e) => {
     delete myNiceBets[e.target.value];
     setMyBets((previousState) => {
@@ -167,35 +176,41 @@ function DefaultPage() {
               );
             })} */}
 
-            {dataFromApi.map((niceTeam) => {
-              return (
-                <TeamGame
-                  buttonClasses={buttonClasses}
-                  key={niceTeam.event_key}
-                  time={niceTeam.event_time}
-                  date={niceTeam.event_date}
-                  homeTeam={niceTeam.event_home_team}
-                  awayTeam={niceTeam.event_away_team}
-                  gameId={niceTeam.event_key}
-                  homeWinOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  awayWinOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  drawOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  over25Odd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  under25Odd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  idontKnowOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  GGOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  NGOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
-                  onAwayWinOddClick={handleBetSelect}
-                  oneHomeWinOddClick={handleBetSelect}
-                  onDrawOddClick={handleBetSelect}
-                  onUnder25OddClick={handleBetSelect}
-                  onOver25OddClick={handleBetSelect}
-                  onNgOddClick={handleBetSelect}
-                  onGGOddClick={handleBetSelect}
-                  onIdontKnowOddClick={handleBetSelect}
-                />
-              );
-            })}
+            {dataFromApi
+              .filter((niceTeam) => {
+                console.log(niceTeam);
+
+                return isTimeEarlier(niceTeam.event_time) == false;
+              })
+              .map((niceTeam) => {
+                return (
+                  <TeamGame
+                    buttonClasses={buttonClasses}
+                    key={niceTeam.event_key}
+                    time={niceTeam.event_time}
+                    date={niceTeam.event_date}
+                    homeTeam={niceTeam.event_home_team}
+                    awayTeam={niceTeam.event_away_team}
+                    gameId={niceTeam.event_key}
+                    homeWinOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    awayWinOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    drawOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    over25Odd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    under25Odd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    idontKnowOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    GGOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    NGOdd={`${(Math.random() * 2 + 1).toFixed(2)}`}
+                    onAwayWinOddClick={handleBetSelect}
+                    oneHomeWinOddClick={handleBetSelect}
+                    onDrawOddClick={handleBetSelect}
+                    onUnder25OddClick={handleBetSelect}
+                    onOver25OddClick={handleBetSelect}
+                    onNgOddClick={handleBetSelect}
+                    onGGOddClick={handleBetSelect}
+                    onIdontKnowOddClick={handleBetSelect}
+                  />
+                );
+              })}
             {/* <SportsNav
               navName="BasketBall"
               midLabel1="O210.5"
