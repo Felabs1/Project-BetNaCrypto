@@ -179,8 +179,12 @@ function DefaultPage() {
             {dataFromApi
               .filter((niceTeam) => {
                 console.log(niceTeam);
-
-                return isTimeEarlier(niceTeam.event_time) == false;
+                const today = new Date();
+                const fromDate = today.toISOString().split("T")[0];
+                if (niceTeam.event_date == fromDate) {
+                  return isTimeEarlier(niceTeam.event_time) == false;
+                }
+                return isTimeEarlier(niceTeam.event_time);
               })
               .map((niceTeam) => {
                 return (
