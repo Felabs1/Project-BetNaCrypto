@@ -35,6 +35,10 @@
   background-position: top;
 }
 
+input {
+  color: #dddddd;
+}
+
 .overlay {
   position: absolute;
   height: 300px;
