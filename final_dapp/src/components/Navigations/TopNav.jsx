@@ -104,7 +104,7 @@ const TopNav = () => {
             <div className="w3-container w3-text-white">
               <span
                 onClick={handleCloseModal}
-                class="w3-btn w3-display-topright"
+                className="w3-btn w3-display-topright"
               >
                 &times;
               </span>

@@ -14,6 +14,8 @@ import {
 import { abi } from "../assets/abi";
 import { claimWonTokens } from "../utils/interactiveWeb3Engine";
 import AlertModal from "../components/Main/AlertModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Casino = () => {
   console.log(web3.eth);
@@ -121,8 +123,8 @@ const Casino = () => {
     const odds = ["20", "0.2", "2", "0.5", "10", "0", "2.5", "0.1"];
     const index = Math.floor(angle / 45); // divide circle into 10 equal parts of 36 degrees each
 
-    SpinDatTing("won " + prices[index], odds[index], v)
-      .then((data) => {
+    async function spin() {
+      await SpinDatTing("won " + prices[index], odds[index], v).then((data) => {
         setValue(prices[index]);
         setMessage("you Won " + prices[index]);
         setSuccessAlert(true);
@@ -133,14 +135,51 @@ const Casino = () => {
 
         // Start the wheel spinning here or call a function to start it
         handleCasinoSpin();
-      })
-      .catch((error) => {
-        // Handle any error that occurred during the SpinDatTing function
-        console.error("Error in SpinDatTing:", error);
       });
+    }
+    // SpinDatTing("won " + prices[index], odds[index], v)
+    //   .then((data) => {
+    //     setValue(prices[index]);
+    //     setMessage("you Won " + prices[index]);
+    //     setSuccessAlert(true);
+    //     fetchData();
+    //     setValue("");
+    //     stakeAmount.current.value = "";
+    //     console.log(prices[index]);
+
+    //     // Start the wheel spinning here or call a function to start it
+    //     handleCasinoSpin();
+    //   })
+    // .catch((error) => {
+    //   // Handle any error that occurred during the SpinDatTing function
+    //   console.error("Error in SpinDatTing:", error);
+    // });
+
+    toast.promise(spin(), {
+      pending: {
+        render() {
+          return "creating Draw...";
+        },
+        icon: false,
+      },
+      success: {
+        render({ data }) {
+          return `You won`;
+        },
+        // other options
+        icon: "🟢",
+      },
+      error: {
+        render({ data }) {
+          return "some error occured";
+          // console.log(data);
+        },
+      },
+    });
   };
   return (
     <>
+      <ToastContainer />
       <TopNav />
       {alert && (
         <AlertModal

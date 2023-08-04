@@ -60,9 +60,9 @@ function DefaultPage() {
     let url;
     // Define the API endpoint URL
     if (date) {
-      url = `https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey=a40e5c3ae99a5914d3cef7bb90fd1c595975285c15d2ebf4ed0a41d1cf71184e&from=${date}&to=${date}`;
+      url = `https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey=01aadde585a97262939cad28a235a1693797e71e79851b62265f25e655ac1f4c&from=${date}&to=${date}`;
     } else {
-      url = `https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey=a40e5c3ae99a5914d3cef7bb90fd1c595975285c15d2ebf4ed0a41d1cf71184e&from=${fromDate}&to=${toDate}`;
+      url = `https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey=01aadde585a97262939cad28a235a1693797e71e79851b62265f25e655ac1f4c&from=${fromDate}&to=${toDate}`;
     }
 
     // Make the GET request

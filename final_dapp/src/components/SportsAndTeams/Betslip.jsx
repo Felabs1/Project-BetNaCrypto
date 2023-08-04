@@ -4,6 +4,8 @@ import GameBetDetails from "./GameBetDetails";
 import { myNiceBets } from "../../utils/prototypeData";
 import { placeNormalBet } from "../../utils/interactiveWeb3Engine";
 import AlertModal from "../Main/AlertModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Betslip = ({ myBets, onRemoveBet }) => {
   const [betAmount, setBetAmount] = useState("");
@@ -33,20 +35,42 @@ const Betslip = ({ myBets, onRemoveBet }) => {
     console.log(sum);
     console.log(betAmount);
     console.log(total);
-    placeNormalBet(betArray, betAmount, sum, total)
-      .then((data) => {
-        // console.log(data);
-        setMessage("Bet Placed succcessfully");
-        setHeading("Bet Success");
-        setNotification(true);
-      })
-      .catch((e) => {
-        if (e.message.includes("ethereum is not defined")) {
-          setMessage("you must install a wallet to continue");
-          setHeading("Wallet Error");
-          setNotification(true);
-        }
-      });
+    // placeNormalBet(betArray, betAmount, sum, total);
+    // .then((data) => {
+    //   // console.log(data);
+    //   setMessage("Bet Placed succcessfully");
+    //   setHeading("Bet Success");
+    //   setNotification(true);
+    // })
+    // .catch((e) => {
+    //   if (e.message.includes("ethereum is not defined")) {
+    //     setMessage("you must install a wallet to continue");
+    //     setHeading("Wallet Error");
+    //     setNotification(true);
+    //   }
+    // });
+
+    toast.promise(placeNormalBet(betArray, betAmount, sum, total), {
+      pending: {
+        render() {
+          return "placing...";
+        },
+        icon: false,
+      },
+      success: {
+        render({ data }) {
+          return `Bet successful`;
+        },
+        // other options
+        icon: "🟢",
+      },
+      error: {
+        render({ data }) {
+          // When the promise reject, data will contains the error
+          console.log(data);
+        },
+      },
+    });
   }
 
   function getTotalOdds() {
@@ -69,6 +93,7 @@ const Betslip = ({ myBets, onRemoveBet }) => {
 
   return (
     <>
+      <ToastContainer />
       {notification && (
         <AlertModal
           message={message}

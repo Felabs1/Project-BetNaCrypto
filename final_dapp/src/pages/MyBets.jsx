@@ -6,6 +6,8 @@ import TopNav from "../components/Navigations/TopNav";
 import { contract, web3 } from "../utils/interactiveWeb3Engine";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./mybets.css";
 
 const MyBets = ({ transactions, history }) => {
@@ -20,19 +22,35 @@ const MyBets = ({ transactions, history }) => {
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
+
     const account = accounts[0];
-    try {
-      const verify = await contract.methods
+    async function claim() {
+      await contract.methods
         .verifyWon(account, value)
-        .send({ from: account, gasLimit: "1000000" })
-        .then((data) => {
-          alert("verification Successful");
-          showMyBets();
-        });
-    } catch (e) {
-      alert("some error occured");
-      console.log(e);
+        .send({ from: account, gasLimit: "1000000" });
     }
+
+    toast.promise(claim(), {
+      pending: {
+        render() {
+          return "Verifying...";
+        },
+        icon: false,
+      },
+      success: {
+        render({ data }) {
+          return `Verification successful`;
+        },
+        // other options
+        icon: "🟢",
+      },
+      error: {
+        render({ data }) {
+          return "some error occured";
+          console.log(data);
+        },
+      },
+    });
   };
 
   async function showMyBets() {
@@ -41,7 +59,7 @@ const MyBets = ({ transactions, history }) => {
     });
     const account = accounts[0];
     const data = await contract.methods.viewTrackedBets(account).call();
-    // console.log(data);
+    console.log(data);
     const formattedData = [];
     for (let i = 0; i < data.length; i++) {
       formattedData.push({
@@ -50,6 +68,7 @@ const MyBets = ({ transactions, history }) => {
         possiblePayout: data[i]["possiblePayout"],
         betWon: data[i]["betWon"],
         deposit: data[i]["deposit"],
+        withdrawn: data[i]["withdrawn"],
       });
     }
     setContractData(formattedData);
@@ -64,13 +83,33 @@ const MyBets = ({ transactions, history }) => {
       method: "eth_requestAccounts",
     });
     const account = accounts[0];
-    const a = await contract.methods
-      .withdrawWinnings(e.target.value)
-      .send({ from: account, gasLimit: "1000000" })
-      .then((data) => {
-        console.log(data);
-        toast("successfuly claimed");
-      });
+    async function claim() {
+      const a = await contract.methods
+        .withdrawWinnings(e.target.value)
+        .send({ from: account, gasLimit: "1000000" });
+    }
+
+    toast.promise(claim(), {
+      pending: {
+        render() {
+          return "Claiming...";
+        },
+        icon: false,
+      },
+      success: {
+        render({ data }) {
+          return `Claim successful`;
+        },
+        // other options
+        icon: "🟢",
+      },
+      error: {
+        render({ data }) {
+          return "some error occured";
+          console.log(data);
+        },
+      },
+    });
   };
 
   const goToLink = (e) => {
@@ -79,6 +118,7 @@ const MyBets = ({ transactions, history }) => {
   console.log(contractData);
   return (
     <>
+      <ToastContainer />
       <TopNav />
       <br />
       <br />
@@ -107,6 +147,7 @@ const MyBets = ({ transactions, history }) => {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* {console.log(contractData)} */}
                     {contractData &&
                       contractData.map(
                         ({
@@ -115,6 +156,7 @@ const MyBets = ({ transactions, history }) => {
                           deposit,
                           possiblePayout,
                           betFinished,
+                          withdrawn,
                         }) => {
                           return (
                             <tr style={{ borderBottom: "1px solid #555" }}>
@@ -143,7 +185,7 @@ const MyBets = ({ transactions, history }) => {
                                 <FaEthereum />
                               </td>
                               <td>
-                                {betWon == true ? (
+                                {betWon == true && withdrawn == false ? (
                                   <span>
                                     <button
                                       className="w3-btn w3-padding-small w3-small"
